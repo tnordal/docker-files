@@ -1,0 +1,42 @@
+version: "3.3"
+services:
+  gitea:
+    image: gitea/gitea:latest
+    container_name: my-gitea
+    environment:
+      - DB_TYPE=${DB_TYPE}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWD=${DB_PASSWD}
+      - SSH_PORT=${SSH_PORT}
+      - DOMAIN=${DOMAIN}
+    restart: always
+    volumes:
+      # - /some/place/on/disk:/data
+      - gitea_data:/data
+    ports:
+      - 3100:3000
+      - 223:223
+    depends_on:
+      - db
+  db:
+    image: postgres:alpine
+    container_name: my-gitea-db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    restart: always
+    volumes:
+      # - /some/place/on/disk:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  gitea_data:
+  db_data:
+
+networks:
+  default:
+    external:
+      name: gitea-network
